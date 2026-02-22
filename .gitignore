@@ -1,0 +1,10 @@
+# Screenshots / médias (trop lourds pour git)
+screenshots/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

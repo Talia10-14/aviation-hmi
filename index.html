@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AERO-DIAG | Diagnostic Avionique — Système Critique</title>
+    <meta name="description"
+        content="Interface de diagnostic avionique critique — surveillance temps réel des systèmes aéronef">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- BARRE SUPÉRIEURE — Identification & Statut Global  -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <header class="topbar" id="topbar">
+        <div class="topbar__left">
+            <div class="topbar__logo">
+                <i class="fas fa-plane"></i>
+                <span class="topbar__brand">AERO-DIAG</span>
+            </div>
+            <div class="topbar__aircraft">
+                <span class="topbar__label">A/C REG</span>
+                <span class="topbar__value" id="aircraft-reg">F-GKXA</span>
+            </div>
+            <div class="topbar__aircraft">
+                <span class="topbar__label">TYPE</span>
+                <span class="topbar__value">A320-214</span>
+            </div>
+            <div class="topbar__aircraft">
+                <span class="topbar__label">MSN</span>
+                <span class="topbar__value">2145</span>
+            </div>
+        </div>
+
+        <div class="topbar__center">
+            <div class="topbar__master-status" id="master-status">
+                <div class="master-status__indicator" id="master-indicator"></div>
+                <span class="master-status__text" id="master-text">SYSTEMS NORMAL</span>
+            </div>
+        </div>
+
+        <div class="topbar__right">
+            <div class="topbar__clock">
+                <span class="topbar__label">UTC</span>
+                <span class="topbar__value topbar__value--mono" id="utc-clock">00:00:00</span>
+            </div>
+            <div class="topbar__clock">
+                <span class="topbar__label">FLT TIME</span>
+                <span class="topbar__value topbar__value--mono" id="flt-time">00:00:00</span>
+            </div>
+            <div class="topbar__session">
+                <span class="topbar__label">SESSION</span>
+                <span class="topbar__value topbar__value--highlight" id="session-id">DG-00421</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CONTENU PRINCIPAL — Layout 3 colonnes              -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <main class="main-layout">
+
+        <!-- ─── PANNEAU GAUCHE : Arborescence Systèmes ─── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar__header">
+                <i class="fas fa-sitemap"></i>
+                <h2>SYSTÈMES</h2>
+            </div>
+            <nav class="sidebar__nav">
+                <button class="sidebar__item sidebar__item--active" data-system="engines" id="sys-engines">
+                    <div class="sidebar__item-icon"><i class="fas fa-fan"></i></div>
+                    <div class="sidebar__item-info">
+                        <span class="sidebar__item-name">MOTEURS</span>
+                        <span class="sidebar__item-sub">CFM56-5B4 × 2</span>
+                    </div>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-engines-status">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </button>
+
+                <button class="sidebar__item" data-system="hydraulics" id="sys-hydraulics">
+                    <div class="sidebar__item-icon"><i class="fas fa-tint"></i></div>
+                    <div class="sidebar__item-info">
+                        <span class="sidebar__item-name">HYDRAULIQUE</span>
+                        <span class="sidebar__item-sub">3 circuits (G/B/Y)</span>
+                    </div>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-hydraulics-status">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </button>
+
+                <button class="sidebar__item" data-system="electrical" id="sys-electrical">
+                    <div class="sidebar__item-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="sidebar__item-info">
+                        <span class="sidebar__item-name">ÉLECTRIQUE</span>
+                        <span class="sidebar__item-sub">AC/DC, APU Gen</span>
+                    </div>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-electrical-status">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </button>
+
+                <button class="sidebar__item" data-system="pressurization" id="sys-pressurization">
+                    <div class="sidebar__item-icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                    <div class="sidebar__item-info">
+                        <span class="sidebar__item-name">PRESSURISATION</span>
+                        <span class="sidebar__item-sub">Cabin ALT / ΔP</span>
+                    </div>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-pressurization-status">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </button>
+
+                <button class="sidebar__item" data-system="flight-controls" id="sys-flight-controls">
+                    <div class="sidebar__item-icon"><i class="fas fa-sliders-h"></i></div>
+                    <div class="sidebar__item-info">
+                        <span class="sidebar__item-name">COMMANDES VOL</span>
+                        <span class="sidebar__item-sub">ELAC / SEC / FAC</span>
+                    </div>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-flight-controls-status">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </button>
+
+                <button class="sidebar__item" data-system="fuel" id="sys-fuel">
+                    <div class="sidebar__item-icon"><i class="fas fa-gas-pump"></i></div>
+                    <div class="sidebar__item-info">
+                        <span class="sidebar__item-name">CARBURANT</span>
+                        <span class="sidebar__item-sub">Inner / Outer / Center</span>
+                    </div>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-fuel-status">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </button>
+
+                <button class="sidebar__item" data-system="apu" id="sys-apu">
+                    <div class="sidebar__item-icon"><i class="fas fa-cog"></i></div>
+                    <div class="sidebar__item-info">
+                        <span class="sidebar__item-name">APU</span>
+                        <span class="sidebar__item-sub">APS3200</span>
+                    </div>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-apu-status">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- ─── ZONE CENTRALE : Diagnostic Temps Réel ─── -->
+        <section class="diagnostic" id="diagnostic-panel">
+
+            <!-- En-tête du panneau de diagnostic -->
+            <div class="diagnostic__header">
+                <h2 class="diagnostic__title" id="diag-title">
+                    <i class="fas fa-fan"></i> MOTEURS — CFM56-5B4
+                </h2>
+                <div class="diagnostic__header-actions">
+                    <button class="btn btn--ghost" id="btn-freeze">
+                        <i class="fas fa-pause"></i> FREEZE
+                    </button>
+                    <button class="btn btn--ghost" id="btn-snapshot">
+                        <i class="fas fa-camera"></i> SNAPSHOT
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grille d'indicateurs — Moteur gauche (ENG1) et Moteur droit (ENG2) -->
+            <div class="diagnostic__engines" id="engines-panel">
+                <div class="diagnostic__section-label">
+                    <span>ENGINE 1 (LEFT)</span>
+                    <span>ENGINE 2 (RIGHT)</span>
+                </div>
+
+                <div class="diagnostic__dual-grid">
+                    <!-- ENG1 Gauges -->
+                    <div class="gauge-group" id="eng1-group">
+                        <div class="gauge-card" id="eng1-n1">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">N1</span>
+                                <span class="gauge-card__unit">%</span>
+                            </div>
+                            <div class="gauge-card__ring">
+                                <svg class="ring-gauge" viewBox="0 0 120 120">
+                                    <circle class="ring-gauge__bg" cx="60" cy="60" r="52" />
+                                    <circle class="ring-gauge__fill ring-gauge__fill--normal" cx="60" cy="60" r="52"
+                                        id="eng1-n1-ring" />
+                                    <circle class="ring-gauge__caution-zone" cx="60" cy="60" r="52" />
+                                    <circle class="ring-gauge__danger-zone" cx="60" cy="60" r="52" />
+                                </svg>
+                                <span class="gauge-card__value" id="eng1-n1-val">0.0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">104</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card" id="eng1-egt">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">EGT</span>
+                                <span class="gauge-card__unit">°C</span>
+                            </div>
+                            <div class="gauge-card__bar">
+                                <div class="bar-gauge">
+                                    <div class="bar-gauge__track">
+                                        <div class="bar-gauge__fill bar-gauge__fill--normal" id="eng1-egt-bar"
+                                            style="width: 0%"></div>
+                                        <div class="bar-gauge__caution-mark"></div>
+                                        <div class="bar-gauge__danger-mark"></div>
+                                    </div>
+                                </div>
+                                <span class="gauge-card__value gauge-card__value--bar" id="eng1-egt-val">0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">950</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card" id="eng1-n2">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">N2</span>
+                                <span class="gauge-card__unit">%</span>
+                            </div>
+                            <div class="gauge-card__bar">
+                                <div class="bar-gauge">
+                                    <div class="bar-gauge__track">
+                                        <div class="bar-gauge__fill bar-gauge__fill--normal" id="eng1-n2-bar"
+                                            style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <span class="gauge-card__value gauge-card__value--bar" id="eng1-n2-val">0.0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">105</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card" id="eng1-ff">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">FF</span>
+                                <span class="gauge-card__unit">kg/h</span>
+                            </div>
+                            <div class="gauge-card__bar">
+                                <div class="bar-gauge">
+                                    <div class="bar-gauge__track">
+                                        <div class="bar-gauge__fill bar-gauge__fill--cyan" id="eng1-ff-bar"
+                                            style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <span class="gauge-card__value gauge-card__value--bar" id="eng1-ff-val">0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">3000</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card gauge-card--horizontal" id="eng1-oil">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">OIL PRESS</span>
+                                <span class="gauge-card__unit">PSI</span>
+                            </div>
+                            <span class="gauge-card__value gauge-card__value--inline" id="eng1-oil-val">0</span>
+                        </div>
+
+                        <div class="gauge-card gauge-card--horizontal" id="eng1-vib">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">VIB N1</span>
+                                <span class="gauge-card__unit">mils</span>
+                            </div>
+                            <span class="gauge-card__value gauge-card__value--inline" id="eng1-vib-val">0.0</span>
+                        </div>
+                    </div>
+
+                    <!-- Séparateur central -->
+                    <div class="diagnostic__center-divider"></div>
+
+                    <!-- ENG2 Gauges -->
+                    <div class="gauge-group" id="eng2-group">
+                        <div class="gauge-card" id="eng2-n1">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">N1</span>
+                                <span class="gauge-card__unit">%</span>
+                            </div>
+                            <div class="gauge-card__ring">
+                                <svg class="ring-gauge" viewBox="0 0 120 120">
+                                    <circle class="ring-gauge__bg" cx="60" cy="60" r="52" />
+                                    <circle class="ring-gauge__fill ring-gauge__fill--normal" cx="60" cy="60" r="52"
+                                        id="eng2-n1-ring" />
+                                </svg>
+                                <span class="gauge-card__value" id="eng2-n1-val">0.0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">104</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card" id="eng2-egt">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">EGT</span>
+                                <span class="gauge-card__unit">°C</span>
+                            </div>
+                            <div class="gauge-card__bar">
+                                <div class="bar-gauge">
+                                    <div class="bar-gauge__track">
+                                        <div class="bar-gauge__fill bar-gauge__fill--normal" id="eng2-egt-bar"
+                                            style="width: 0%"></div>
+                                        <div class="bar-gauge__caution-mark"></div>
+                                        <div class="bar-gauge__danger-mark"></div>
+                                    </div>
+                                </div>
+                                <span class="gauge-card__value gauge-card__value--bar" id="eng2-egt-val">0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">950</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card" id="eng2-n2">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">N2</span>
+                                <span class="gauge-card__unit">%</span>
+                            </div>
+                            <div class="gauge-card__bar">
+                                <div class="bar-gauge">
+                                    <div class="bar-gauge__track">
+                                        <div class="bar-gauge__fill bar-gauge__fill--normal" id="eng2-n2-bar"
+                                            style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <span class="gauge-card__value gauge-card__value--bar" id="eng2-n2-val">0.0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">105</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card" id="eng2-ff">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">FF</span>
+                                <span class="gauge-card__unit">kg/h</span>
+                            </div>
+                            <div class="gauge-card__bar">
+                                <div class="bar-gauge">
+                                    <div class="bar-gauge__track">
+                                        <div class="bar-gauge__fill bar-gauge__fill--cyan" id="eng2-ff-bar"
+                                            style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <span class="gauge-card__value gauge-card__value--bar" id="eng2-ff-val">0</span>
+                            </div>
+                            <div class="gauge-card__limits">
+                                <span class="gauge-card__limit gauge-card__limit--min">0</span>
+                                <span class="gauge-card__limit gauge-card__limit--max">3000</span>
+                            </div>
+                        </div>
+
+                        <div class="gauge-card gauge-card--horizontal" id="eng2-oil">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">OIL PRESS</span>
+                                <span class="gauge-card__unit">PSI</span>
+                            </div>
+                            <span class="gauge-card__value gauge-card__value--inline" id="eng2-oil-val">0</span>
+                        </div>
+
+                        <div class="gauge-card gauge-card--horizontal" id="eng2-vib">
+                            <div class="gauge-card__header">
+                                <span class="gauge-card__label">VIB N1</span>
+                                <span class="gauge-card__unit">mils</span>
+                            </div>
+                            <span class="gauge-card__value gauge-card__value--inline" id="eng2-vib-val">0.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panneau hydraulique (masqué par défaut) -->
+            <div class="diagnostic__generic-panel hidden" id="hydraulics-panel">
+                <div class="diagnostic__param-grid" id="hyd-params"></div>
+            </div>
+
+            <!-- Panneau électrique (masqué par défaut) -->
+            <div class="diagnostic__generic-panel hidden" id="electrical-panel">
+                <div class="diagnostic__param-grid" id="elec-params"></div>
+            </div>
+
+            <!-- Panneau pressurisation (masqué par défaut) -->
+            <div class="diagnostic__generic-panel hidden" id="pressurization-panel">
+                <div class="diagnostic__param-grid" id="press-params"></div>
+            </div>
+
+            <!-- Panneau commandes de vol (masqué par défaut) -->
+            <div class="diagnostic__generic-panel hidden" id="flight-controls-panel">
+                <div class="diagnostic__param-grid" id="fctl-params"></div>
+            </div>
+
+            <!-- Panneau carburant (masqué par défaut) -->
+            <div class="diagnostic__generic-panel hidden" id="fuel-panel">
+                <div class="diagnostic__param-grid" id="fuel-params"></div>
+            </div>
+
+            <!-- Panneau APU (masqué par défaut) -->
+            <div class="diagnostic__generic-panel hidden" id="apu-panel">
+                <div class="diagnostic__param-grid" id="apu-params"></div>
+            </div>
+
+        </section>
+
+        <!-- ─── PANNEAU DROIT : Journal d'alarmes ECAM ─── -->
+        <aside class="alarm-log" id="alarm-log">
+            <div class="alarm-log__header">
+                <div class="alarm-log__title-row">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>ECAM LOG</h2>
+                </div>
+                <div class="alarm-log__counters">
+                    <span class="alarm-counter alarm-counter--warning" id="warn-count" title="Warnings">
+                        <i class="fas fa-radiation"></i> <span>0</span>
+                    </span>
+                    <span class="alarm-counter alarm-counter--caution" id="caut-count" title="Cautions">
+                        <i class="fas fa-exclamation"></i> <span>0</span>
+                    </span>
+                </div>
+            </div>
+            <div class="alarm-log__list" id="alarm-list">
+                <div class="alarm-log__empty">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>NO ACTIVE FAULTS</span>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- BARRE INFÉRIEURE — Actions rapides                 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <footer class="bottombar" id="bottombar">
+        <div class="bottombar__left">
+            <button class="btn btn--warning" id="btn-master-warn">
+                <i class="fas fa-bell"></i> MASTER WARN
+                <span class="btn__badge hidden" id="master-warn-badge">0</span>
+            </button>
+            <button class="btn btn--caution" id="btn-master-caut">
+                <i class="fas fa-bell"></i> MASTER CAUT
+                <span class="btn__badge hidden" id="master-caut-badge">0</span>
+            </button>
+        </div>
+        <div class="bottombar__center">
+            <button class="btn btn--primary" id="btn-ack">
+                <i class="fas fa-check-double"></i> ACK ALL
+            </button>
+            <button class="btn btn--ghost" id="btn-reset">
+                <i class="fas fa-redo-alt"></i> RESET
+            </button>
+            <button class="btn btn--ghost" id="btn-export">
+                <i class="fas fa-download"></i> EXPORT CFR
+            </button>
+            <button class="btn btn--ghost" id="btn-test-mode">
+                <i class="fas fa-flask"></i> TEST MODE
+            </button>
+        </div>
+        <div class="bottombar__right">
+            <div class="bottombar__status">
+                <span class="bottombar__label">DATA LINK</span>
+                <span class="bottombar__indicator bottombar__indicator--active" id="data-link-status"></span>
+            </div>
+            <div class="bottombar__status">
+                <span class="bottombar__label">BITE</span>
+                <span class="bottombar__indicator bottombar__indicator--active" id="bite-status"></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
