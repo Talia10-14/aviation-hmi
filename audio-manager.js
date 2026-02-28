@@ -548,10 +548,17 @@ class AudioManager {
      */
     showSettings() {
         let panel = document.querySelector('.audio-settings');
-        if (!panel) {
-            panel = this.createSettingsPanel();
-            document.body.appendChild(panel);
+        if (panel) {
+            // Toggle : si le panneau existe, on le ferme
+            panel.remove();
+            return;
         }
+        
+        // Forcer la reprise de l'AudioContext (exigé par les navigateurs mobiles)
+        this.resumeContext();
+        
+        panel = this.createSettingsPanel();
+        document.body.appendChild(panel);
         
         // Update translations if i18n is available
         if (window.i18n) {
@@ -565,8 +572,12 @@ export const audioManager = new AudioManager();
 window.audioManager = audioManager;
 
 // Resume audio context on first user interaction
-document.addEventListener('click', () => {
-    audioManager.resumeContext();
-}, { once: true });
+// Sur mobile, l'AudioContext est suspendu tant qu'il n'y a pas d'interaction
+// On écoute aussi 'touchstart' pour couvrir les appareils tactiles
+['click', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        audioManager.resumeContext();
+    }, { once: true });
+});
 
 export default audioManager;
