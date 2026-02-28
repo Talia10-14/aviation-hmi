@@ -379,6 +379,11 @@ import './modal-utils.js';
             btn.addEventListener('click', () => switchSystem(btn.dataset.system));
         });
 
+        // Mobile system navigation (visible <768px, remplace la sidebar)
+        document.querySelectorAll('.mobile-sys-nav__btn').forEach(btn => {
+            btn.addEventListener('click', () => switchSystem(btn.dataset.system));
+        });
+
         // Freeze / Snapshot
         document.getElementById('btn-freeze').addEventListener('click', toggleFreeze);
         document.getElementById('btn-snapshot').addEventListener('click', takeSnapshot);
@@ -865,6 +870,11 @@ import './modal-utils.js';
             const isActive = el.dataset.system === sysKey;
             el.classList.toggle('sidebar__item--active', isActive);
             el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        // Update mobile system nav (barre onglets visible sur mobile)
+        document.querySelectorAll('.mobile-sys-nav__btn').forEach(el => {
+            el.classList.toggle('mobile-sys-nav__btn--active', el.dataset.system === sysKey);
         });
 
         // Update title

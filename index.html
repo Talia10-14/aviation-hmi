@@ -177,6 +177,31 @@
         <section class="diagnostic" id="diagnostic-panel" role="region" aria-label="Panneau de diagnostic temps réel">
 
             <!-- En-tête du panneau de diagnostic -->
+            <!-- ── Navigation systèmes mobile (masquée sur desktop/tablet) ── -->
+            <nav class="mobile-sys-nav" id="mobile-sys-nav" aria-label="Sélection système">
+                <button class="mobile-sys-nav__btn mobile-sys-nav__btn--active" data-system="engines">
+                    <i class="fas fa-fan"></i><span>MOT</span>
+                </button>
+                <button class="mobile-sys-nav__btn" data-system="hydraulics">
+                    <i class="fas fa-tint"></i><span>HYD</span>
+                </button>
+                <button class="mobile-sys-nav__btn" data-system="electrical">
+                    <i class="fas fa-bolt"></i><span>ELEC</span>
+                </button>
+                <button class="mobile-sys-nav__btn" data-system="pressurization">
+                    <i class="fas fa-compress-arrows-alt"></i><span>PRESS</span>
+                </button>
+                <button class="mobile-sys-nav__btn" data-system="flight-controls">
+                    <i class="fas fa-plane"></i><span>F/CTL</span>
+                </button>
+                <button class="mobile-sys-nav__btn" data-system="fuel">
+                    <i class="fas fa-gas-pump"></i><span>FUEL</span>
+                </button>
+                <button class="mobile-sys-nav__btn" data-system="apu">
+                    <i class="fas fa-car-battery"></i><span>APU</span>
+                </button>
+            </nav>
+
             <div class="diagnostic__header">
                 <h2 class="diagnostic__title" id="diag-title">
                     <i class="fas fa-fan"></i> MOTEURS — CFM56-5B4
