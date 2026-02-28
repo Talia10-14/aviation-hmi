@@ -43,11 +43,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/votre-username/aviation-hmi.git"
-  },playwright/test": "^1.41.0",
-    "@vitest/ui": "^1.2.0",
+    "url": "https://github.com/Talia10-14/aviation-hmi.git"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
     "@vitejs/plugin-legacy": "^5.3.0",
     "@vitest/coverage-v8": "^1.2.0",
+    "@vitest/ui": "^1.2.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-html": "^8.0.0",
@@ -56,13 +58,7 @@
     "lint-staged": "^15.2.0",
     "prettier": "^3.2.4",
     "vite": "^5.0.11",
-    "vitest": "^1.20",
-    "lint-staged": "^15.2.0",
-    "prettier": "^3.2.4",
-    "vite": "^5.0.11",
-    "vitest": "^1.2.0",
-    "@vitest/coverage-v8": "^1.2.0",
-    "jsdom": "^24.0.0"
+    "vitest": "^1.2.0"
   },
   "engines": {
     "node": ">=18.0.0",
