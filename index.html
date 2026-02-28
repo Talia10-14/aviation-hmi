@@ -3,17 +3,25 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>AERO-DIAG | Diagnostic Avionique — Système Critique</title>
     <meta name="description"
         content="Interface de diagnostic avionique critique — surveillance temps réel des systèmes aéronef">
+    
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; script-src 'self'; img-src 'self' data:; connect-src 'self';">
+    
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer">
 </head>
 
 <body>
@@ -21,7 +29,7 @@
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- BARRE SUPÉRIEURE — Identification & Statut Global  -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <header class="topbar" id="topbar">
+    <header class="topbar" id="topbar" role="banner" aria-label="En-tête principal avec informations aéronef">
         <div class="topbar__left">
             <div class="topbar__logo">
                 <i class="fas fa-plane"></i>
@@ -42,23 +50,31 @@
         </div>
 
         <div class="topbar__center">
-            <div class="topbar__master-status" id="master-status">
-                <div class="master-status__indicator" id="master-indicator"></div>
+            <div class="topbar__master-status" id="master-status" role="status" aria-live="assertive" aria-atomic="true">
+                <div class="master-status__indicator" id="master-indicator" aria-hidden="true"></div>
                 <span class="master-status__text" id="master-text">SYSTEMS NORMAL</span>
             </div>
         </div>
 
         <div class="topbar__right">
+            <div id="profile-selector-container"></div>
+            <div id="language-selector-container"></div>
+            <button class="topbar__icon-btn" id="btn-theme-settings" title="Thème et personnalisation">
+                <i class="fas fa-palette"></i>
+            </button>
+            <button class="topbar__icon-btn" id="btn-audio-settings" title="Paramètres audio">
+                <i class="fas fa-volume-up"></i>
+            </button>
             <div class="topbar__clock">
-                <span class="topbar__label">UTC</span>
+                <span class="topbar__label" data-i18n="topbar.utc">UTC</span>
                 <span class="topbar__value topbar__value--mono" id="utc-clock">00:00:00</span>
             </div>
             <div class="topbar__clock">
-                <span class="topbar__label">FLT TIME</span>
+                <span class="topbar__label" data-i18n="topbar.flt_time">FLT TIME</span>
                 <span class="topbar__value topbar__value--mono" id="flt-time">00:00:00</span>
             </div>
             <div class="topbar__session">
-                <span class="topbar__label">SESSION</span>
+                <span class="topbar__label" data-i18n="topbar.session">SESSION</span>
                 <span class="topbar__value topbar__value--highlight" id="session-id">DG-00421</span>
             </div>
         </div>
@@ -67,23 +83,25 @@
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- CONTENU PRINCIPAL — Layout 3 colonnes              -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <main class="main-layout">
+    <main class="main-layout" role="main" aria-label="Interface de diagnostic avionique">
 
         <!-- ─── PANNEAU GAUCHE : Arborescence Systèmes ─── -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar" role="complementary" aria-label="Navigation des systèmes">
             <div class="sidebar__header">
-                <i class="fas fa-sitemap"></i>
+                <i class="fas fa-sitemap" aria-hidden="true"></i>
                 <h2>SYSTÈMES</h2>
             </div>
-            <nav class="sidebar__nav">
-                <button class="sidebar__item sidebar__item--active" data-system="engines" id="sys-engines">
-                    <div class="sidebar__item-icon"><i class="fas fa-fan"></i></div>
+            <nav class="sidebar__nav" role="navigation" aria-label="Sélection du système à diagnostiquer">
+                <button class="sidebar__item sidebar__item--active" data-system="engines" id="sys-engines"
+                    aria-label="Système moteurs CFM56-5B4, statut normal"
+                    aria-pressed="true">
+                    <div class="sidebar__item-icon" aria-hidden="true"><i class="fas fa-fan"></i></div>
                     <div class="sidebar__item-info">
                         <span class="sidebar__item-name">MOTEURS</span>
                         <span class="sidebar__item-sub">CFM56-5B4 × 2</span>
                     </div>
-                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-engines-status">
-                        <i class="fas fa-check-circle"></i>
+                    <div class="sidebar__item-status sidebar__item-status--normal" id="sys-engines-status" aria-label="Statut normal">
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
                     </div>
                 </button>
 
@@ -156,7 +174,7 @@
         </aside>
 
         <!-- ─── ZONE CENTRALE : Diagnostic Temps Réel ─── -->
-        <section class="diagnostic" id="diagnostic-panel">
+        <section class="diagnostic" id="diagnostic-panel" role="region" aria-label="Panneau de diagnostic temps réel">
 
             <!-- En-tête du panneau de diagnostic -->
             <div class="diagnostic__header">
@@ -164,12 +182,110 @@
                     <i class="fas fa-fan"></i> MOTEURS — CFM56-5B4
                 </h2>
                 <div class="diagnostic__header-actions">
-                    <button class="btn btn--ghost" id="btn-freeze">
-                        <i class="fas fa-pause"></i> FREEZE
+                    <button class="btn btn--ghost" id="btn-freeze" aria-label="Geler la simulation" aria-keyshortcut="F">
+                        <i class="fas fa-pause" aria-hidden="true"></i> FREEZE
                     </button>
-                    <button class="btn btn--ghost" id="btn-snapshot">
-                        <i class="fas fa-camera"></i> SNAPSHOT
+                    <button class="btn btn--ghost" id="btn-snapshot" aria-label="Capturer un instantané" aria-keyshortcut="S">
+                        <i class="fas fa-camera" aria-hidden="true"></i> SNAPSHOT
                     </button>
+                    <button class="btn btn--ghost" id="btn-simulation" aria-label="Ouvrir le panneau de simulation" title="Contrôles de simulation avancés">
+                        <i class="fas fa-sliders-h" aria-hidden="true"></i> SIMULATION
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panneau de simulation réaliste -->
+            <div class="simulation-panel" id="simulation-panel" style="display: none;">
+                <div class="simulation-panel__header">
+                    <h3><i class="fas fa-cogs"></i> Simulation Réaliste</h3>
+                    <button class="btn btn--icon" id="close-simulation-panel" aria-label="Fermer">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="simulation-panel__content">
+                    <!-- Scénarios de certification -->
+                    <div class="simulation-section">
+                        <h4><i class="fas fa-certificate"></i> Scénarios CS-25</h4>
+                        <select id="scenario-select" class="simulation-select">
+                            <option value="">Sélectionner un scénario...</option>
+                            <optgroup label="Certification CS-25">
+                                <option value="CS25_ENGINE_FAILURE_TAKEOFF">🔥 Panne moteur au décollage (V1)</option>
+                                <option value="CS25_DUAL_ENGINE_FAILURE">⚠️ Perte des 2 moteurs</option>
+                                <option value="CS25_RAPID_DECOMPRESSION">💨 Décompression rapide</option>
+                                <option value="CS25_HYDRAULIC_FAILURE">💧 Panne hydraulique multiple</option>
+                            </optgroup>
+                            <optgroup label="Scénarios Opérationnels">
+                                <option value="BIRD_STRIKE">🦅 Impact aviaire</option>
+                                <option value="FUEL_LEAK_CRUISE">⛽ Fuite carburant</option>
+                                <option value="ELECTRICAL_EMERGENCY">⚡ Urgence électrique</option>
+                                <option value="SEVERE_ICING">❄️ Givrage sévère</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Pannes individuelles -->
+                    <div class="simulation-section">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Pannes Individuelles</h4>
+                        <div class="fault-buttons">
+                            <button class="btn btn--small btn--danger" id="fault-eng1-flameout">
+                                <i class="fas fa-fire"></i> ENG1 Flameout
+                            </button>
+                            <button class="btn btn--small btn--danger" id="fault-eng2-flameout">
+                                <i class="fas fa-fire"></i> ENG2 Flameout
+                            </button>
+                            <button class="btn btn--small btn--warning" id="fault-hyd-green-leak">
+                                <i class="fas fa-tint"></i> HYD Green Leak
+                            </button>
+                            <button class="btn btn--small btn--warning" id="fault-elec-gen1-fail">
+                                <i class="fas fa-bolt"></i> GEN1 Failure
+                            </button>
+                            <button class="btn btn--small btn--danger" id="fault-press-loss">
+                                <i class="fas fa-compress-arrows-alt"></i> Press. Loss
+                            </button>
+                            <button class="btn btn--small btn--ghost" id="clear-all-faults">
+                                <i class="fas fa-eraser"></i> Effacer tout
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Replay FDR -->
+                    <div class="simulation-section">
+                        <h4><i class="fas fa-database"></i> Replay FDR/QAR</h4>
+                        <div class="fdr-controls">
+                            <input type="file" id="fdr-file-input" accept=".csv,.json" class="fdr-file-input">
+                            <label for="fdr-file-input" class="btn btn--small">
+                                <i class="fas fa-upload"></i> Charger FDR
+                            </label>
+                        </div>
+                        <div class="fdr-playback" id="fdr-playback" style="display: none;">
+                            <div class="fdr-info">
+                                <span id="replay-status" class="fdr-status">STOPPED</span>
+                                <span id="replay-time-display" class="fdr-time">00:00:00 / 00:00:00</span>
+                            </div>
+                            <div class="fdr-progress-container">
+                                <input type="range" id="replay-progress" min="0" max="100" value="0" class="fdr-progress">
+                            </div>
+                            <div class="fdr-controls-bottom">
+                                <button class="btn btn--icon" id="replay-play-pause" aria-label="Play">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <label class="fdr-speed-label">
+                                    Vitesse: <span id="replay-speed-display">1.0x</span>
+                                    <input type="range" id="replay-speed" min="0.1" max="10" step="0.1" value="1" class="fdr-speed-slider">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pannes actives -->
+                    <div class="simulation-section">
+                        <h4><i class="fas fa-list"></i> Pannes Actives <span id="fault-count-badge" class="badge">0</span></h4>
+                        <div id="active-faults-display" class="active-faults" style="display: none;"></div>
+                    </div>
+
+                    <!-- Scénario actif -->
+                    <div id="active-scenario-display" class="active-scenario" style="display: none;"></div>
                 </div>
             </div>
 
@@ -193,8 +309,6 @@
                                     <circle class="ring-gauge__bg" cx="60" cy="60" r="52" />
                                     <circle class="ring-gauge__fill ring-gauge__fill--normal" cx="60" cy="60" r="52"
                                         id="eng1-n1-ring" />
-                                    <circle class="ring-gauge__caution-zone" cx="60" cy="60" r="52" />
-                                    <circle class="ring-gauge__danger-zone" cx="60" cy="60" r="52" />
                                 </svg>
                                 <span class="gauge-card__value" id="eng1-n1-val">0.0</span>
                             </div>
@@ -418,10 +532,15 @@
                 <div class="diagnostic__param-grid" id="apu-params"></div>
             </div>
 
+            <!-- Zone Synoptic (masquée par défaut) -->
+            <div class="diagnostic__synoptic hidden" id="synoptic-container">
+                <!-- Le contenu SVG est généré dynamiquement par synoptics.js -->
+            </div>
+
         </section>
 
         <!-- ─── PANNEAU DROIT : Journal d'alarmes ECAM ─── -->
-        <aside class="alarm-log" id="alarm-log">
+        <aside class="alarm-log" id="alarm-log" role="complementary" aria-label="Journal des alarmes ECAM">
             <div class="alarm-log__header">
                 <div class="alarm-log__title-row">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -436,9 +555,9 @@
                     </span>
                 </div>
             </div>
-            <div class="alarm-log__list" id="alarm-list">
+            <div class="alarm-log__list" id="alarm-list" role="log" aria-live="polite" aria-atomic="false" aria-relevant="additions">
                 <div class="alarm-log__empty">
-                    <i class="fas fa-shield-alt"></i>
+                    <i class="fas fa-shield-alt" aria-hidden="true"></i>
                     <span>NO ACTIVE FAULTS</span>
                 </div>
             </div>
@@ -448,29 +567,50 @@
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- BARRE INFÉRIEURE — Actions rapides                 -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <footer class="bottombar" id="bottombar">
+    <footer class="bottombar" id="bottombar" role="contentinfo" aria-label="Barre d'actions et alertes maîtresses">
         <div class="bottombar__left">
             <button class="btn btn--warning" id="btn-master-warn">
-                <i class="fas fa-bell"></i> MASTER WARN
+                <i class="fas fa-bell"></i> <span data-i18n="btn.master_warn">MASTER WARN</span>
                 <span class="btn__badge hidden" id="master-warn-badge">0</span>
             </button>
             <button class="btn btn--caution" id="btn-master-caut">
-                <i class="fas fa-bell"></i> MASTER CAUT
+                <i class="fas fa-bell"></i> <span data-i18n="btn.master_caut">MASTER CAUT</span>
                 <span class="btn__badge hidden" id="master-caut-badge">0</span>
             </button>
         </div>
         <div class="bottombar__center">
             <button class="btn btn--primary" id="btn-ack">
-                <i class="fas fa-check-double"></i> ACK ALL
+                <i class="fas fa-check-double"></i> <span data-i18n="btn.ack_all">ACK ALL</span>
             </button>
             <button class="btn btn--ghost" id="btn-reset">
-                <i class="fas fa-redo-alt"></i> RESET
+                <i class="fas fa-redo-alt"></i> <span data-i18n="btn.reset">RESET</span>
             </button>
             <button class="btn btn--ghost" id="btn-export">
-                <i class="fas fa-download"></i> EXPORT CFR
+                <i class="fas fa-download"></i> <span data-i18n="btn.export">EXPORT CFR</span>
             </button>
             <button class="btn btn--ghost" id="btn-test-mode">
-                <i class="fas fa-flask"></i> TEST MODE
+                <i class="fas fa-flask"></i> <span data-i18n="btn.test_mode">TEST MODE</span>
+            </button>
+            <button class="btn btn--ghost" id="btn-synoptic">
+                <i class="fas fa-project-diagram"></i> <span data-i18n="btn.synoptic">SYNOPTIC</span>
+            </button>
+            <button class="btn btn--ghost" id="btn-voice-alerts" aria-pressed="true">
+                <i class="fas fa-volume-up"></i> <span data-i18n="btn.voice_alerts">VOICE ALERTS</span>
+            </button>
+            <button class="btn btn--ghost" id="btn-bite">
+                <i class="fas fa-wrench"></i> <span data-i18n="btn.bite">BITE</span>
+            </button>
+            <button class="btn btn--ghost" id="btn-training">
+                <i class="fas fa-graduation-cap"></i> <span data-i18n="btn.training">TRAINING</span>
+            </button>
+            <button class="btn btn--ghost" id="btn-trend">
+                <i class="fas fa-chart-line"></i> <span data-i18n="btn.trends">TRENDS</span>
+            </button>
+            <button class="btn btn--ghost" id="btn-analytics">
+                <i class="fas fa-chart-bar"></i> <span data-i18n="btn.analytics">ANALYTICS</span>
+            </button>
+            <button class="btn btn--ghost" id="btn-documentation">
+                <i class="fas fa-book"></i> <span data-i18n="btn.documentation">HELP</span>
             </button>
         </div>
         <div class="bottombar__right">
@@ -485,7 +625,48 @@
         </div>
     </footer>
 
-    <script src="app.js"></script>
+    <!-- Training Actions Panel (shown only during active training scenario) -->
+    <div id="training-actions-panel" class="training-actions-panel" style="display: none;">
+        <div class="training-actions-panel__header">
+            <h3><i class="fas fa-tasks"></i> Actions Requises</h3>
+            <button class="training-actions-panel__toggle" title="Réduire/Agrandir">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="training-actions-panel__body">
+            <div id="training-actions-list" class="training-actions-list">
+                <!-- Actions will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts modules -->
+    <script type="module" src="modal-utils.js"></script>
+    <script type="module" src="procedures.js"></script>
+    <script type="module" src="fault-history.js"></script>
+    <script type="module" src="voice-alerts.js"></script>
+    <script type="module" src="synoptics.js"></script>
+    <script type="module" src="app-features.js"></script>
+    <script type="module" src="bite.js"></script>
+    <script type="module" src="training-mode.js"></script>
+    <script type="module" src="trend-monitoring.js"></script>
+    <script type="module" src="app-advanced-features.js"></script>
+    
+    <!-- v2.6.0 Enhancement Modules -->
+    <script type="module" src="i18n.js"></script>
+    <script type="module" src="documentation.js"></script>
+    <script type="module" src="export-manager.js"></script>
+    <script type="module" src="analytics.js"></script>
+    
+    <!-- v2.7.0 UX/UI Enhancement Modules -->
+    <script type="module" src="theme-manager.js"></script>
+    <script type="module" src="user-profiles.js"></script>
+    <script type="module" src="animations.js"></script>
+    <script type="module" src="audio-manager.js"></script>
+    <script type="module" src="touch-gestures.js"></script>
+    
+    <!-- Main application logic with simulation -->
+    <script type="module" src="app.js"></script>
 </body>
 
 </html>

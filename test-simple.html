@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Buttons Simple</title>
+    <style>
+        body {
+            background: #060a14;
+            color: #e0e6ed;
+            font-family: monospace;
+            padding: 40px;
+        }
+        .btn {
+            padding: 12px 24px;
+            margin: 10px;
+            background: #101828;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e6ed;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #1a2740;
+        }
+        .log {
+            margin: 20px 0;
+            padding: 15px;
+            background: #101828;
+            border-left: 3px solid #00ff88;
+            font-size: 13px;
+        }
+        .success {
+            color: #00ff88;
+        }
+        .error {
+            color: #ff3344;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Simple des Boutons</h1>
+    
+    <p>Ce test vérifie si les event listeners fonctionnent correctement.</p>
+    
+    <div>
+        <button class="btn" id="btn-bite">
+            <i class="fas fa-wrench"></i> BITE
+        </button>
+        <button class="btn" id="btn-training">
+            <i class="fas fa-graduation-cap"></i> TRAINING
+        </button>
+        <button class="btn" id="btn-trend">
+            <i class="fas fa-chart-line"></i> TRENDS
+        </button>
+    </div>
+    
+    <div id="logs" class="log">
+        <div class="success">✓ Page chargée</div>
+    </div>
+    
+    <script>
+        const logsDiv = document.getElementById('logs');
+        
+        function log(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = isSuccess ? 'success' : 'error';
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(div);
+        }
+        
+        // Attendre que le DOM soit prêt
+        document.addEventListener('DOMContentLoaded', () => {
+            log('✓ DOMContentLoaded déclenché');
+            
+            // Vérifier que les boutons existent
+            const biteBtn = document.getElementById('btn-bite');
+            const trainingBtn = document.getElementById('btn-training');
+            const trendBtn = document.getElementById('btn-trend');
+            
+            if (biteBtn) {
+                log('✓ Bouton BITE trouvé');
+                biteBtn.addEventListener('click', () => {
+                    log('✓ BITE CLIQUÉ !');
+                    alert('BITE button works!');
+                });
+            } else {
+                log('✗ Bouton BITE non trouvé', false);
+            }
+            
+            if (trainingBtn) {
+                log('✓ Bouton TRAINING trouvé');
+                trainingBtn.addEventListener('click', () => {
+                    log('✓ TRAINING CLIQUÉ !');
+                    alert('TRAINING button works!');
+                });
+            } else {
+                log('✗ Bouton TRAINING non trouvé', false);
+            }
+            
+            if (trendBtn) {
+                log('✓ Bouton TRENDS trouvé');
+                trendBtn.addEventListener('click', () => {
+                    log('✓ TRENDS CLIQUÉ !');
+                    alert('TRENDS button works!');
+                });
+            } else {
+                log('✗ Bouton TRENDS non trouvé', false);
+            }
+            
+            log('✓ Tous les event listeners attachés');
+        });
+        
+        // Log readyState
+        log(`Document readyState: ${document.readyState}`);
+        
+        // Si déjà chargé
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            log('⚠ DOM déjà chargé, listeners non attachés');
+        }
+    </script>
+</body>
+</html>

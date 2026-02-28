@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>Test de Responsivité - AERO-DIAG</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            background: var(--bg-primary);
+            min-height: 100vh;
+        }
+
+        .test-header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .test-title {
+            font-family: var(--font-data);
+            color: var(--status-normal);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .test-info {
+            font-family: var(--font-ui);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .viewport-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-family: var(--font-data);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .test-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            color: var(--status-info);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 10px;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .breakpoint-indicator {
+            background: var(--bg-panel);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-medium);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .breakpoint-indicator.active {
+            border-color: var(--status-normal);
+            background: var(--status-normal-dim);
+        }
+
+        .breakpoint-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .breakpoint-range {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-family: var(--font-data);
+        }
+
+        /* Indicateurs de breakpoints */
+        @media screen and (min-width: 2560px) {
+            #bp-ultra-large { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media screen and (min-width: 1920px) and (max-width: 2559px) {
+            #bp-large-desktop { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media screen and (min-width: 1441px) and (max-width: 1919px) {
+            #bp-standard-desktop { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media screen and (max-width: 1440px) {
+            #bp-large-tablet { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media screen and (max-width: 1024px) {
+            #bp-tablet { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media screen and (max-width: 768px) {
+            #bp-mobile-landscape { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media screen and (max-width: 600px) {
+            #bp-mobile-portrait { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media screen and (max-width: 360px) {
+            #bp-very-small { border-color: var(--status-normal); background: var(--status-normal-dim); }
+        }
+
+        @media (orientation: landscape) {
+            #orientation-landscape { border-color: var(--status-info); background: var(--status-info-dim); }
+        }
+
+        @media (orientation: portrait) {
+            #orientation-portrait { border-color: var(--status-info); background: var(--status-info-dim); }
+        }
+
+        @media (hover: hover) {
+            #device-mouse { border-color: var(--status-cyan); background: rgba(0, 229, 255, 0.15); }
+        }
+
+        @media (hover: none) {
+            #device-touch { border-color: var(--status-cyan); background: rgba(0, 229, 255, 0.15); }
+        }
+
+        @media (prefers-contrast: high) {
+            #feature-high-contrast { border-color: var(--status-caution); background: var(--status-caution-dim); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #feature-reduced-motion { border-color: var(--status-caution); background: var(--status-caution-dim); }
+        }
+
+        .responsive-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .demo-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            transition: transform 0.3s;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-medium);
+        }
+
+        .gauge-demo {
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--status-normal);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-data);
+            font-size: 1.5rem;
+            color: var(--status-normal);
+        }
+
+        @container card (max-width: 200px) {
+            .gauge-demo {
+                width: 70px;
+                height: 70px;
+                font-size: 1rem;
+            }
+        }
+
+        @container card (min-width: 300px) {
+            .gauge-demo {
+                width: 120px;
+                height: 120px;
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <div class="test-title">📱 Test de Responsivité - AERO-DIAG</div>
+            <div class="test-info">Redimensionnez votre navigateur pour voir les breakpoints actifs</div>
+        </div>
+
+        <!-- Informations Viewport -->
+        <div class="viewport-info">
+            <div class="info-card">
+                <div class="info-label">Largeur Viewport</div>
+                <div class="info-value" id="viewport-width">--</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Hauteur Viewport</div>
+                <div class="info-value" id="viewport-height">--</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Ratio d'aspect</div>
+                <div class="info-value" id="aspect-ratio">--</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Densité de pixels</div>
+                <div class="info-value" id="pixel-ratio">--</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Orientation</div>
+                <div class="info-value" id="orientation">--</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Type d'appareil</div>
+                <div class="info-value" id="device-type">--</div>
+            </div>
+        </div>
+
+        <!-- Breakpoints -->
+        <div class="test-section">
+            <div class="section-title">🎯 Breakpoints Actifs</div>
+            <div class="test-grid">
+                <div class="breakpoint-indicator" id="bp-ultra-large">
+                    <div class="breakpoint-name">Ultra Large (4K+)</div>
+                    <div class="breakpoint-range">≥ 2560px</div>
+                </div>
+                <div class="breakpoint-indicator" id="bp-large-desktop">
+                    <div class="breakpoint-name">Large Desktop (2K)</div>
+                    <div class="breakpoint-range">1920px - 2559px</div>
+                </div>
+                <div class="breakpoint-indicator" id="bp-standard-desktop">
+                    <div class="breakpoint-name">Standard Desktop</div>
+                    <div class="breakpoint-range">1441px - 1919px</div>
+                </div>
+                <div class="breakpoint-indicator" id="bp-large-tablet">
+                    <div class="breakpoint-name">Large Tablet</div>
+                    <div class="breakpoint-range">1025px - 1440px</div>
+                </div>
+                <div class="breakpoint-indicator" id="bp-tablet">
+                    <div class="breakpoint-name">Tablet</div>
+                    <div class="breakpoint-range">769px - 1024px</div>
+                </div>
+                <div class="breakpoint-indicator" id="bp-mobile-landscape">
+                    <div class="breakpoint-name">Mobile Landscape</div>
+                    <div class="breakpoint-range">601px - 768px</div>
+                </div>
+                <div class="breakpoint-indicator" id="bp-mobile-portrait">
+                    <div class="breakpoint-name">Mobile Portrait</div>
+                    <div class="breakpoint-range">361px - 600px</div>
+                </div>
+                <div class="breakpoint-indicator" id="bp-very-small">
+                    <div class="breakpoint-name">Very Small</div>
+                    <div class="breakpoint-range">≤ 360px</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orientation & Device Type -->
+        <div class="test-section">
+            <div class="section-title">📐 Orientation & Type d'Appareil</div>
+            <div class="test-grid">
+                <div class="breakpoint-indicator" id="orientation-landscape">
+                    <div class="breakpoint-name">🖥️ Paysage</div>
+                    <div class="breakpoint-range">Landscape</div>
+                </div>
+                <div class="breakpoint-indicator" id="orientation-portrait">
+                    <div class="breakpoint-name">📱 Portrait</div>
+                    <div class="breakpoint-range">Portrait</div>
+                </div>
+                <div class="breakpoint-indicator" id="device-mouse">
+                    <div class="breakpoint-name">🖱️ Souris/Trackpad</div>
+                    <div class="breakpoint-range">Hover: hover</div>
+                </div>
+                <div class="breakpoint-indicator" id="device-touch">
+                    <div class="breakpoint-name">👆 Tactile</div>
+                    <div class="breakpoint-range">Hover: none</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accessibility Features -->
+        <div class="test-section">
+            <div class="section-title">♿ Fonctionnalités d'Accessibilité</div>
+            <div class="test-grid">
+                <div class="breakpoint-indicator" id="feature-high-contrast">
+                    <div class="breakpoint-name">Contraste Élevé</div>
+                    <div class="breakpoint-range">prefers-contrast: high</div>
+                </div>
+                <div class="breakpoint-indicator" id="feature-reduced-motion">
+                    <div class="breakpoint-name">Mouvement Réduit</div>
+                    <div class="breakpoint-range">prefers-reduced-motion</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container Queries Demo -->
+        <div class="test-section">
+            <div class="section-title">📦 Container Queries Demo</div>
+            <div class="test-info" style="margin-bottom: 15px;">
+                Les cartes ci-dessous s'adaptent à leur propre taille (container queries), pas à la taille de l'écran.
+            </div>
+            <div class="responsive-demo">
+                <div class="demo-card" style="container-type: inline-size; container-name: card;">
+                    <div class="gauge-demo">85%</div>
+                    <div style="text-align: center; color: var(--text-secondary);">
+                        S'adapte à la taille du container
+                    </div>
+                </div>
+                <div class="demo-card" style="container-type: inline-size; container-name: card;">
+                    <div class="gauge-demo">92%</div>
+                    <div style="text-align: center; color: var(--text-secondary);">
+                        Responsive indépendant
+                    </div>
+                </div>
+                <div class="demo-card" style="container-type: inline-size; container-name: card;">
+                    <div class="gauge-demo">78%</div>
+                    <div style="text-align: center; color: var(--text-secondary);">
+                        Container queries CSS
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const ratio = (width / height).toFixed(2);
+            const pixelRatio = window.devicePixelRatio || 1;
+            const orientation = width > height ? 'Paysage' : 'Portrait';
+
+            let deviceType = 'Desktop';
+            if (width < 600) deviceType = 'Mobile';
+            else if (width < 1024) deviceType = 'Tablette';
+
+            document.getElementById('viewport-width').textContent = width + 'px';
+            document.getElementById('viewport-height').textContent = height + 'px';
+            document.getElementById('aspect-ratio').textContent = ratio;
+            document.getElementById('pixel-ratio').textContent = pixelRatio + 'x';
+            document.getElementById('orientation').textContent = orientation;
+            document.getElementById('device-type').textContent = deviceType;
+        }
+
+        // Mise à jour au chargement
+        updateViewportInfo();
+
+        // Mise à jour au redimensionnement
+        window.addEventListener('resize', updateViewportInfo);
+
+        // Detection des préférences utilisateur
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            console.log('✅ Mode sombre préféré');
+        }
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            console.log('✅ Mouvement réduit activé');
+        }
+
+        if (window.matchMedia('(prefers-contrast: high)').matches) {
+            console.log('✅ Contraste élevé activé');
+        }
+
+        console.log('🎯 Test de responsivité AERO-DIAG chargé');
+        console.log('📝 Consultez RESPONSIVE-DESIGN.md pour la documentation complète');
+    </script>
+</body>
+</html>

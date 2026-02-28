@@ -1,0 +1,87 @@
+{
+  "name": "aviation-hmi",
+  "version": "1.0.0",
+  "description": "Interface Homme-Machine de diagnostic avionique temps réel pour la surveillance des systèmes critiques d'aéronef",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:all": "npm run test && npm run test:e2e",
+    "test:report": "playwright show-report",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,html,css,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,html,css,json,md}\"",
+    "prepare": "husky install",
+    "check": "npm run lint && npm run format:check && npm run test"
+  },
+  "keywords": [
+    "aviation",
+    "hmi",
+    "diagnostic",
+    "ecam",
+    "avionics",
+    "dashboard",
+    "monitoring",
+    "real-time",
+    "cockpit"
+  ],
+  "author": {
+    "name": "AERO-DIAG Team",
+    "email": "contact@aerodiag.dev"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/votre-username/aviation-hmi.git"
+  },playwright/test": "^1.41.0",
+    "@vitest/ui": "^1.2.0",
+    "@vitejs/plugin-legacy": "^5.3.0",
+    "@vitest/coverage-v8": "^1.2.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-html": "^8.0.0",
+    "husky": "^9.0.0",
+    "jsdom": "^24.0.0",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "vite": "^5.0.11",
+    "vitest": "^1.20",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "vite": "^5.0.11",
+    "vitest": "^1.2.0",
+    "@vitest/coverage-v8": "^1.2.0",
+    "jsdom": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "Firefox ESR",
+    "not dead",
+    "not IE 11"
+  ],
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{html,css,json,md}": [
+      "prettier --write"
+    ]
+  }
+}

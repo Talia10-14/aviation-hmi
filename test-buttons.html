@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Advanced Features Buttons</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff88;
+            padding: 20px;
+        }
+        .log {
+            margin: 10px 0;
+            padding: 10px;
+            background: #1a1a1a;
+            border-left: 3px solid #00ff88;
+        }
+        .error {
+            border-left-color: #ff3344;
+            color: #ff3344;
+        }
+        button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 16px;
+            background: #00ff88;
+            border: none;
+            cursor: pointer;
+            color: #0a0a0a;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #00cc66;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Advanced Features</h1>
+    
+    <div>
+        <button onclick="testBITE()">Test BITE Module</button>
+        <button onclick="testTraining()">Test Training Module</button>
+        <button onclick="testTrend()">Test Trend Module</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+    
+    <h2>Logs:</h2>
+    <div id="logs"></div>
+    
+    <script type="module">
+        import { biteSystem } from './bite.js';
+        import { trainingSystem } from './training-mode.js';
+        import { trendMonitoring } from './trend-monitoring.js';
+        
+        window.biteSystem = biteSystem;
+        window.trainingSystem = trainingSystem;
+        window.trendMonitoring = trendMonitoring;
+        
+        function log(message, isError = false) {
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = isError ? 'log error' : 'log';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.insertBefore(logEntry, logsDiv.firstChild);
+        }
+        
+        window.log = log;
+        
+        window.testBITE = function() {
+            try {
+                log('Testing BITE System...');
+                
+                const systems = biteSystem.getAvailableSystems();
+                log(`✓ Found ${systems.length} systems`);
+                
+                const stats = biteSystem.getStatistics();
+                log(`✓ Statistics: ${stats.total} tests, ${stats.passRate}% pass rate`);
+                
+                const testSystem = systems[0];
+                log(`✓ Will test system: ${testSystem.name} (${testSystem.id})`);
+                
+                // Run test
+                log(`Running test on ${testSystem.name}...`);
+                biteSystem.runSystemTest(testSystem.id).then(result => {
+                    log(`✓ Test completed: ${result.overallStatus}`);
+                    log(`  - Duration: ${(result.duration / 1000).toFixed(1)}s`);
+                    log(`  - Tests run: ${result.tests.length}`);
+                }).catch(err => {
+                    log(`✗ Test failed: ${err.message}`, true);
+                });
+                
+            } catch (error) {
+                log(`✗ ERROR: ${error.message}`, true);
+                console.error(error);
+            }
+        };
+        
+        window.testTraining = function() {
+            try {
+                log('Testing Training System...');
+                
+                const scenarios = trainingSystem.getScenarios();
+                log(`✓ Found ${scenarios.length} scenarios`);
+                
+                const stats = trainingSystem.getStatistics();
+                log(`✓ Statistics: ${stats.totalSessions} sessions, ${stats.averageScore}% avg score`);
+                
+                const status = trainingSystem.getStatus();
+                log(`✓ Status: ${status.running ? 'Running' : 'Idle'}`);
+                
+                if (!status.running && scenarios.length > 0) {
+                    const testScenario = scenarios[0];
+                    log(`✓ Starting scenario: ${testScenario.name}`);
+                    
+                    const info = trainingSystem.startScenario(testScenario.id);
+                    log(`✓ Scenario started: ${info.scenario.name}`);
+                    log(`  - Duration: ${info.scenario.duration}s`);
+                    log(`  - Actions: ${info.scenario.expectedActions.length}`);
+                    
+                    setTimeout(() => {
+                        const result = trainingSystem.endScenario();
+                        log(`✓ Scenario ended. Score: ${result.scorePercentage}% (${result.passed ? 'PASSED' : 'FAILED'})`);
+                    }, 3000);
+                }
+                
+            } catch (error) {
+                log(`✗ ERROR: ${error.message}`, true);
+                console.error(error);
+            }
+        };
+        
+        window.testTrend = function() {
+            try {
+                log('Testing Trend Monitoring...');
+                
+                // Create mock appState
+                window.appState = {
+                    sensorData: {
+                        eng1: { n1: 85, egt: 650, oilPress: 50, vibN1: 1.5 },
+                        eng2: { n1: 84, egt: 648, oilPress: 52, vibN1: 1.4 },
+                        hydraulics: { greenPress: 3000, bluePress: 3000, yellowPress: 3000 },
+                        electrical: { gen1Load: 50, gen2Load: 48, batTemp: 25 }
+                    }
+                };
+                
+                const dashboard = trendMonitoring.getDashboardData();
+                log(`✓ Dashboard: ${dashboard.stats.totalFlights} flights, ${dashboard.stats.totalParameters} params`);
+                
+                const params = trendMonitoring.getParametersSummary();
+                log(`✓ Parameters: ${params.length} monitored`);
+                
+                const alerts = trendMonitoring.getActiveAlerts();
+                log(`✓ Active alerts: ${alerts.length}`);
+                
+                if (!trendMonitoring.recording) {
+                    log('Starting flight recording...');
+                    const flightId = trendMonitoring.startFlight({
+                        registration: 'F-GKXA',
+                        type: 'A320-214'
+                    });
+                    log(`✓ Flight recording started: ${flightId}`);
+                    
+                    setTimeout(() => {
+                        trendMonitoring.stopFlight();
+                        log('✓ Flight recording stopped');
+                        
+                        const report = trendMonitoring.generateMaintenanceReport();
+                        log(`✓ Report generated: ${report.recommendationCount} recommendations`);
+                    }, 5000);
+                } else {
+                    log('Flight recording already active');
+                }
+                
+            } catch (error) {
+                log(`✗ ERROR: ${error.message}`, true);
+                console.error(error);
+            }
+        };
+        
+        window.clearLogs = function() {
+            document.getElementById('logs').innerHTML = '';
+        };
+        
+        log('✓ All modules loaded successfully');
+    </script>
+</body>
+</html>

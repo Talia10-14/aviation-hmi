@@ -3,13 +3,48 @@
 /* Real-time sensor simulation, alarm management, ECAM   */
 /* ═══════════════════════════════════════════════════════ */
 
+import SimulationManager from './simulation/simulation-manager.js';
+import './modal-utils.js';
+
 (() => {
     'use strict';
+
+    // ── Instance de simulation réaliste ──
+    const simulationManager = new SimulationManager();
 
     // ── Configuration ──
     const UPDATE_INTERVAL = 1000;     // ms
     const ALARM_CHECK_INTERVAL = 3000;
     const MAX_LOG_ENTRIES = 50;
+    const DEBUG_MODE = false; // Set to true for verbose logging
+
+    /**
+     * Safe logging utility
+     * @param {string} level - Log level (info, warn, error)
+     * @param {string} message - Log message
+     * @param {*} data - Additional data to log
+     */
+    function logSafe(level, message, data = null) {
+        if (!DEBUG_MODE && level === 'info') return;
+        
+        const timestamp = new Date().toISOString();
+        const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+        
+        try {
+            switch(level) {
+                case 'error':
+                    console.error(logMessage, data);
+                    break;
+                case 'warn':
+                    console.warn(logMessage, data);
+                    break;
+                default:
+                    console.log(logMessage, data);
+            }
+        } catch (e) {
+            // Fallback if console is unavailable
+        }
+    }
 
     // ── Seuils par paramètre (caution / warning) ──
     const THRESHOLDS = {
@@ -176,15 +211,154 @@
     // INITIALIZATION
     // ═══════════════════════════════════════════════════════
 
+    // ═══════════════════════════════════════════════════════
+    // v2.6.0 ENHANCEMENTS INITIALIZATION
+    // ═══════════════════════════════════════════════════════
+
+    /**
+     * Initialize v2.6.0 enhancement features
+     */
+    function initEnhancements() {
+        // Wait for ES6 modules to load before initializing
+        const tryInit = () => {
+            // Initialize language selector (v2.6.0)
+            if (window.i18n) {
+                const container = document.getElementById('language-selector-container');
+                if (container && !container.hasChildNodes()) {
+                    // Apply initial translations to DOM elements
+                    window.i18n.updateDOM();
+                    
+                    const selector = window.i18n.createLanguageSelector();
+                    container.appendChild(selector);
+                    
+                    // Listen for language changes to update app state labels
+                    document.addEventListener('languageChanged', (e) => {
+                        console.log('[APP] Language changed to:', e.detail.language);
+                        // Refresh dynamic content
+                        renderAlarmLog();
+                        updateMasterStatus();
+                    });
+                }
+            }
+
+            // Initialize profile selector (v2.7.0)
+            if (window.userProfiles) {
+                const profileContainer = document.getElementById('profile-selector-container');
+                if (profileContainer && !profileContainer.hasChildNodes()) {
+                    const profileSelector = window.userProfiles.createProfileSelector();
+                    profileContainer.appendChild(profileSelector);
+                    
+                    // Apply current profile preferences
+                    const currentProfile = window.userProfiles.getCurrentProfile();
+                    if (currentProfile) {
+                        window.userProfiles.applyProfilePreferences(currentProfile);
+                        console.log('[APP] Profile preferences applied:', currentProfile.name);
+                    }
+
+                    // Increment session count
+                    window.userProfiles.incrementSession();
+                }
+            }
+
+            // Initialize theme manager (v2.7.0)
+            if (window.themeManager) {
+                console.log('[APP] Theme manager initialized:', window.themeManager.getCurrentTheme());
+            }
+
+            // Initialize audio manager (v2.7.0)
+            if (window.audioManager) {
+                // Start ambient cockpit sounds only if explicitly enabled by user
+                const profile = window.userProfiles?.getCurrentProfile();
+                if (profile?.preferences.soundEffects && profile?.preferences.ambientSounds) {
+                    window.audioManager.setAmbientEnabled(true);
+                }
+                console.log('[APP] Audio manager initialized');
+            }
+
+            // Initialize touch gestures (v2.7.0)
+            if (window.touchGestures) {
+                console.log('[APP] Touch gestures initialized');
+            }
+
+            // Initialize animations (v2.7.0)
+            if (window.animations) {
+                console.log('[APP] Animations manager initialized');
+            }
+        };
+
+        // Try immediately
+        tryInit();
+        
+        // Retry after a short delay in case modules aren't loaded yet
+        setTimeout(tryInit, 100);
+        setTimeout(tryInit, 500);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // INITIALIZATION
+    // ═══════════════════════════════════════════════════════
+
     function init() {
         bindEvents();
         renderGenericPanels();
+        
+        // Initialize v2.6.0 features
+        initEnhancements();
+        
+        // Initialize simulation manager UI
+        simulationManager.initUI();
+        
+        // Expose fault injection for training mode
+        window.triggerTestFault = (faultCode, details = {}) => {
+            // Map training fault codes to simulation fault types
+            const faultMapping = {
+                // Engine faults
+                'ENG-N1-HI': { type: 'ENG_FLAMEOUT', target: details.engine === 1 ? 'eng1' : 'eng2' },
+                'ENG-EGT-HI': { type: 'ENG_OVERHEAT', target: details.engine === 1 ? 'eng1' : 'eng2' },
+                'ENG-FAIL': { type: 'ENG_FLAMEOUT', target: details.engine === 1 ? 'eng1' : 'eng2' },
+                'ENG-FIRE': { type: 'ENG_OVERHEAT', target: details.engine === 1 ? 'eng1' : 'eng2' },
+                'ENG-OIL-LO': { type: 'ENG_OIL_LOSS', target: details.engine === 1 ? 'eng1' : 'eng2' },
+                'ENG-VIB-HI': { type: 'ENG_HIGH_VIB', target: details.engine === 1 ? 'eng1' : 'eng2' },
+                
+                // Hydraulic faults
+                'HYD-GRN-LO': { type: 'HYD_LEAK', target: 'green' },
+                'HYD-YEL-LO': { type: 'HYD_LEAK', target: 'yellow' },
+                'HYD-BLU-LO': { type: 'HYD_LEAK', target: 'blue' },
+                
+                // Electrical faults
+                'ELEC-GEN-HI': { type: 'ELEC_GEN_FAIL', target: details.generator === 1 ? 'gen1' : 'gen2' },
+                'ELEC-GEN-FAIL': { type: 'ELEC_GEN_FAIL', target: details.generator === 1 ? 'gen1' : 'gen2' },
+                
+                // Pressurization faults
+                'PRESS-CAB-HI': { type: 'PRESS_LOSS', target: null },
+                'PRESS-LOSS': { type: 'PRESS_LOSS', target: null },
+                
+                // Fuel faults
+                'FUEL-LEAK': { type: 'FUEL_LEAK', target: details.tank || null },
+                'FUEL-IMBALANCE': { type: 'FUEL_IMBALANCE', target: null }
+            };
+            
+            const fault = faultMapping[faultCode];
+            if (fault) {
+                console.log(`[TRAINING] Injecting fault: ${faultCode} -> ${fault.type} (${fault.target || 'none'})`);
+                simulationManager.injectFault(fault.type, fault.target);
+                return true;
+            } else {
+                console.warn(`[TRAINING] Unknown fault code: ${faultCode}`);
+                return false;
+            }
+        };
+        
         updateClock();
         setInterval(updateClock, 1000);
         setInterval(() => {
             if (!state.frozen) {
-                simulateSensors();
+                // Utiliser le modèle de vol réaliste
+                simulationManager.update(state.frozen);
+                state.sensorData = simulationManager.getSensorData();
                 updateAllDisplays();
+                simulationManager.updateScenarioDisplay();
+                simulationManager.updateFaultDisplay();
             }
         }, UPDATE_INTERVAL);
         setInterval(() => {
@@ -212,12 +386,142 @@
         // Acknowledge / Reset
         document.getElementById('btn-ack').addEventListener('click', acknowledgeAll);
         document.getElementById('btn-reset').addEventListener('click', resetSystem);
-        document.getElementById('btn-export').addEventListener('click', exportReport);
+        document.getElementById('btn-export').addEventListener('click', () => {
+            // Use new export manager if available, otherwise fallback to old export
+            if (window.exportManager) {
+                window.exportManager.showExportDialog();
+            } else {
+                exportReport();
+            }
+        });
         document.getElementById('btn-test-mode').addEventListener('click', toggleTestMode);
+
+        // v2.6.0 Enhancement Features
+        document.getElementById('btn-analytics')?.addEventListener('click', () => {
+            if (window.analytics) {
+                window.analytics.show();
+            } else {
+                console.error('Analytics module not loaded');
+            }
+        });
+
+        document.getElementById('btn-documentation')?.addEventListener('click', () => {
+            if (window.documentation) {
+                window.documentation.show('quick-start');
+            } else {
+                console.error('Documentation module not loaded');
+            }
+        });
+
+        // v2.7.0 UX Enhancement Features
+        document.getElementById('btn-theme-settings')?.addEventListener('click', () => {
+            if (window.themeManager) {
+                window.themeManager.showSettings();
+            } else {
+                console.error('Theme manager module not loaded');
+            }
+        });
+
+        document.getElementById('btn-audio-settings')?.addEventListener('click', () => {
+            if (window.audioManager) {
+                window.audioManager.showSettings();
+            } else {
+                console.error('Audio manager module not loaded');
+            }
+        });
+
+        // Simulation panel toggle
+        document.getElementById('btn-simulation')?.addEventListener('click', () => {
+            const panel = document.getElementById('simulation-panel');
+            if (panel) {
+                const isVisible = panel.style.display !== 'none';
+                panel.style.display = isVisible ? 'none' : 'block';
+            }
+        });
+
+        document.getElementById('close-simulation-panel')?.addEventListener('click', () => {
+            const panel = document.getElementById('simulation-panel');
+            if (panel) {
+                panel.style.display = 'none';
+            }
+        });
+
+        // Show FDR playback controls when file is loaded
+        document.getElementById('fdr-file-input')?.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const playbackPanel = document.getElementById('fdr-playback');
+                if (playbackPanel) {
+                    playbackPanel.style.display = 'block';
+                }
+            }
+        });
 
         // Master buttons
         document.getElementById('btn-master-warn').addEventListener('click', () => flashMaster('warning'));
         document.getElementById('btn-master-caut').addEventListener('click', () => flashMaster('caution'));
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', handleKeyboardShortcuts);
+    }
+
+    /**
+     * Handle keyboard shortcuts for accessibility
+     * @param {KeyboardEvent} e - Keyboard event
+     */
+    function handleKeyboardShortcuts(e) {
+        // Ignore if user is typing in an input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        const key = e.key.toLowerCase();
+        
+        switch(key) {
+            case 'f':
+                e.preventDefault();
+                toggleFreeze();
+                logSafe('info', 'Keyboard shortcut: Freeze toggled');
+                break;
+            case 's':
+                e.preventDefault();
+                takeSnapshot();
+                logSafe('info', 'Keyboard shortcut: Snapshot taken');
+                break;
+            case 'a':
+                e.preventDefault();
+                acknowledgeAll();
+                logSafe('info', 'Keyboard shortcut: All alarms acknowledged');
+                break;
+            case 'r':
+                if (e.ctrlKey || e.metaKey) return; // Don't override browser refresh
+                e.preventDefault();
+                resetSystem();
+                logSafe('info', 'Keyboard shortcut: System reset');
+                break;
+            case 't':
+                e.preventDefault();
+                toggleTestMode();
+                logSafe('info', 'Keyboard shortcut: Test mode toggled');
+                break;
+            case 'escape':
+                e.preventDefault();
+                acknowledgeAll();
+                logSafe('info', 'Keyboard shortcut: Alarms dismissed');
+                break;
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+                e.preventDefault();
+                const systems = ['engines', 'hydraulics', 'electrical', 'pressurization', 'flight-controls', 'fuel', 'apu'];
+                const index = parseInt(key) - 1;
+                if (systems[index]) {
+                    switchSystem(systems[index]);
+                    logSafe('info', `Keyboard shortcut: Switched to ${systems[index]}`);
+                }
+                break;
+        }
     }
 
 
@@ -241,12 +545,47 @@
     // ═══════════════════════════════════════════════════════
     // SENSOR SIMULATION
     // ═══════════════════════════════════════════════════════
+    
+    // NOTE: La simulation basique de capteurs a été remplacée par le modèle
+    // de vol réaliste (SimulationManager). L'ancienne fonction simulateSensors()
+    // est conservée ci-dessous pour référence mais n'est plus utilisée.
+    
+    // Les données proviennent maintenant de:
+    // - simulation/flight-model.js (physique de vol A320)
+    // - simulation/fault-injection.js (pannes et scénarios)
+    // - simulation/fdr-replay.js (rejeu de données FDR)
 
-    function jitter(value, range, min = 0, max = Infinity) {
-        const delta = (Math.random() - 0.5) * 2 * range;
-        return Math.max(min, Math.min(max, value + delta));
+    /**
+     * Validate and clamp a numeric value within bounds
+     * @param {number} value - Value to validate
+     * @param {number} min - Minimum allowed value
+     * @param {number} max - Maximum allowed value
+     * @returns {number} Clamped value
+     */
+    function validateValue(value, min, max) {
+        if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+            console.warn(`Invalid sensor value: ${value}`);
+            return (min + max) / 2; // Return midpoint as safe default
+        }
+        return Math.max(min, Math.min(max, value));
     }
 
+    /**
+     * Add controlled jitter to a value for simulation
+     * @param {number} value - Base value
+     * @param {number} range - Jitter range
+     * @param {number} min - Minimum value
+     * @param {number} max - Maximum value
+     * @returns {number} Jittered value
+     */
+    function jitter(value, range, min = 0, max = Infinity) {
+        const delta = (Math.random() - 0.5) * 2 * range;
+        const newValue = value + delta;
+        return validateValue(newValue, min, max);
+    }
+
+    // LEGACY: Ancienne simulation simplifiée (non utilisée)
+    /*
     function simulateSensors() {
         const d = state.sensorData;
 
@@ -305,6 +644,8 @@
         d.fuel.fuelFlow = jitter(d.fuel.fuelFlow, 10, 2000, 3500);
         d.fuel.fuelTemp = jitter(d.fuel.fuelTemp, 0.2, -40, 30);
     }
+    */
+    // Fin de l'ancienne fonction simulateSensors (remplacée par SimulationManager)
 
 
     // ═══════════════════════════════════════════════════════
@@ -373,7 +714,10 @@
 
     function updateRingGauge(id, pct) {
         const el = document.getElementById(id);
-        if (!el) return;
+        if (!el) {
+            logSafe('warn', `Ring gauge element not found: ${id}`);
+            return;
+        }
         const circumference = 2 * Math.PI * 52;
         const offset = circumference * (1 - Math.min(1, pct));
         el.style.strokeDashoffset = offset;
@@ -381,14 +725,20 @@
 
     function updateRingColor(id, status) {
         const el = document.getElementById(id);
-        if (!el) return;
+        if (!el) {
+            logSafe('warn', `Ring element not found: ${id}`);
+            return;
+        }
         el.classList.remove('ring-gauge__fill--normal', 'ring-gauge__fill--caution', 'ring-gauge__fill--warning');
         el.classList.add(`ring-gauge__fill--${status}`);
     }
 
     function updateBarGauge(id, pct, status) {
         const el = document.getElementById(id);
-        if (!el) return;
+        if (!el) {
+            logSafe('warn', `Bar gauge element not found: ${id}`);
+            return;
+        }
         el.style.width = `${Math.min(100, pct)}%`;
         el.classList.remove('bar-gauge__fill--normal', 'bar-gauge__fill--caution', 'bar-gauge__fill--warning');
         el.classList.add(`bar-gauge__fill--${status}`);
@@ -396,7 +746,10 @@
 
     function updateValueDisplay(id, value, status) {
         const el = document.getElementById(id);
-        if (!el) return;
+        if (!el) {
+            logSafe('warn', `Value display element not found: ${id}`);
+            return;
+        }
         el.textContent = value;
         el.classList.remove('gauge-card__value--caution', 'gauge-card__value--warning');
         if (status === 'caution') el.classList.add('gauge-card__value--caution');
@@ -509,7 +862,9 @@
 
         // Update sidebar
         document.querySelectorAll('.sidebar__item').forEach(el => {
-            el.classList.toggle('sidebar__item--active', el.dataset.system === sysKey);
+            const isActive = el.dataset.system === sysKey;
+            el.classList.toggle('sidebar__item--active', isActive);
+            el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
 
         // Update title
@@ -527,8 +882,10 @@
             if (!el) return;
             if (pid === cfg.panelId) {
                 el.classList.remove('hidden');
+                el.setAttribute('aria-hidden', 'false');
             } else {
                 el.classList.add('hidden');
+                el.setAttribute('aria-hidden', 'true');
             }
         });
 
@@ -537,6 +894,8 @@
         if (sectionLabel) {
             sectionLabel.style.display = sysKey === 'engines' ? '' : 'none';
         }
+
+        logSafe('info', `Switched to system: ${sysKey}`);
     }
 
 
@@ -572,6 +931,11 @@
 
         state.alarms.unshift(alarm);
         if (state.alarms.length > MAX_LOG_ENTRIES) state.alarms.pop();
+
+        // Trigger voice alert if features loaded
+        if (window.appFeatures) {
+            window.appFeatures.triggerVoiceAlertForFault(fault.code, fault.level);
+        }
 
         // Update counts
         updateAlarmCounts();
@@ -644,27 +1008,49 @@
 
     function renderAlarmLog() {
         const list = document.getElementById('alarm-list');
+        
+        // Helper to get translations
+        const t = (key) => window.i18n ? window.i18n.t(key) : key;
+        
         if (state.alarms.length === 0) {
+            const noFaultsMsg = t('msg.no_faults');
             list.innerHTML = `
                 <div class="alarm-log__empty">
                     <i class="fas fa-shield-alt"></i>
-                    <span>NO ACTIVE FAULTS</span>
+                    <span>${noFaultsMsg}</span>
                 </div>`;
             return;
         }
 
+        const procBtnText = t('proc.button');
+        const procViewTitle = t('proc.view');
+        
         list.innerHTML = state.alarms.map(a => `
             <div class="alarm-entry alarm-entry--${a.level}" style="${a.acknowledged ? 'opacity: 0.4;' : ''}">
                 <div class="alarm-entry__time">${a.time} UTC</div>
                 <div class="alarm-entry__code">${a.acknowledged ? '✓ ' : ''}${a.code}</div>
                 <div class="alarm-entry__msg">${a.msg}</div>
+                <button class="alarm-entry__proc-btn" data-fault="${a.code}" title="${procViewTitle}">
+                    <i class="fas fa-book"></i> ${procBtnText}
+                </button>
             </div>
         `).join('');
+        
+        // Add event listeners to PROC buttons
+        list.querySelectorAll('.alarm-entry__proc-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const faultCode = e.currentTarget.dataset.fault;
+                if (window.appFeatures) {
+                    window.appFeatures.showProcedureModal(faultCode);
+                }
+            });
+        });
     }
 
     function updateMasterStatus() {
         const masterEl = document.getElementById('master-status');
         const textEl = document.getElementById('master-text');
+        const t = (key) => window.i18n ? window.i18n.t(key) : key;
 
         let status = 'normal';
         if (state.warnCount > 0) status = 'warning';
@@ -673,12 +1059,12 @@
         masterEl.classList.remove('status--caution', 'status--warning');
         if (status === 'caution') {
             masterEl.classList.add('status--caution');
-            textEl.textContent = 'CAUTION';
+            textEl.textContent = t('topbar.status.caution');
         } else if (status === 'warning') {
             masterEl.classList.add('status--warning');
-            textEl.textContent = '⚠ MASTER WARNING';
+            textEl.textContent = '⚠ ' + t('topbar.status.warning');
         } else {
-            textEl.textContent = 'SYSTEMS NORMAL';
+            textEl.textContent = t('topbar.status.normal');
         }
         state.masterStatus = status;
     }
@@ -811,5 +1197,9 @@
     // ═══════════════════════════════════════════════════════
 
     document.addEventListener('DOMContentLoaded', init);
+
+    // Expose state for feature modules
+    window.appState = state;
+    window.simulationManager = simulationManager;
 
 })();
