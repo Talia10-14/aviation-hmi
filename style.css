@@ -3348,11 +3348,11 @@ body {
 }
 
 .language-selector__btn {
-    background: rgba(0, 229, 255, 0.1);
-    border: 1px solid rgba(0, 229, 255, 0.3);
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid rgba(0, 229, 255, 0.25);
     color: var(--accent-blue, #00e5ff);
     padding: 0.4rem 0.75rem;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
     cursor: pointer;
     font-family: var(--font-ui);
     font-size: 0.75rem;
@@ -3362,56 +3362,115 @@ body {
     gap: 0.375rem;
     transition: all 0.2s ease;
     white-space: nowrap;
-    min-height: 2.25rem;         /* Touch-friendly */
+    min-height: 2.25rem;
 }
 
 .language-selector__btn:hover {
-    background: rgba(0, 229, 255, 0.2);
+    background: rgba(0, 229, 255, 0.15);
     border-color: var(--accent-blue, #00e5ff);
+}
+
+/* Chevron rotation animée à l'ouverture */
+.language-selector__btn i {
+    font-size: 0.6rem;
+    transition: transform 0.25s ease;
+    opacity: 0.7;
+}
+.language-selector:has(.language-selector__dropdown:not(.hidden)) .language-selector__btn i {
+    transform: rotate(180deg);
 }
 
 .language-selector__code {
     color: var(--accent-blue, #00e5ff);
     font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
 }
 
+/* ── Dropdown : animation slide + fade ── */
 .language-selector__dropdown {
     position: absolute;
-    top: calc(100% + 0.375rem);
+    top: calc(100% + 0.5rem);
     right: 0;
-    background: var(--bg-secondary);
-    border: 1px solid rgba(0, 229, 255, 0.3);
-    border-radius: 0.375rem;
-    padding: 0.375rem;
-    min-width: 10rem;
+    background: var(--bg-card, var(--bg-secondary));
+    border: 1px solid var(--border-medium);
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    min-width: 12rem;
     z-index: 10000;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(0, 229, 255, 0.08);
+    backdrop-filter: blur(12px);
+    /* Animation d'ouverture */
+    transform-origin: top right;
+    animation: langDropdownIn 0.2s ease-out;
 }
 
+.language-selector__dropdown.hidden {
+    display: none;
+}
+
+@keyframes langDropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── Options : style carte avec séparateur subtil ── */
 .language-selector__option {
-    padding: 0.625rem 0.75rem;
+    padding: 0.6rem 0.75rem;
     cursor: pointer;
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
     display: flex;
     align-items: center;
-    gap: 0.625rem;
-    transition: background 0.2s ease;
+    gap: 0.75rem;
+    transition: background 0.15s ease, transform 0.15s ease;
     color: var(--text-primary);
+    font-family: var(--font-ui);
     font-size: 0.8rem;
-    min-height: 2.5rem;           /* Touch-friendly option */
+    font-weight: 500;
+    min-height: 2.5rem;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.language-selector__option + .language-selector__option {
+    border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
 }
 
 .language-selector__option:hover {
-    background: rgba(0, 229, 255, 0.1);
+    background: rgba(0, 229, 255, 0.08);
+    transform: translateX(2px);
 }
 
 .language-selector__option--active {
-    background: rgba(0, 229, 255, 0.2);
+    background: rgba(0, 229, 255, 0.12);
     color: var(--accent-blue, #00e5ff);
+    font-weight: 600;
+}
+.language-selector__option--active::after {
+    content: '\f00c';     /* fa-check */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 0.65rem;
+    margin-left: auto;
+    opacity: 0.8;
 }
 
 .language-selector__flag {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.language-selector__name {
+    flex: 1;
 }
 
 /* ─── Documentation Modal ─── */
