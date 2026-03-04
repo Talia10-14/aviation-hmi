@@ -3672,9 +3672,13 @@ body {
     padding: 0.75rem 1.25rem;
     border-bottom: 1px solid rgba(0, 229, 255, 0.08);
     flex-shrink: 0;
+    position: relative;         /* Ancre pour l'icône positionnée absolute */
 }
 
 .doc-modal__search input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     width: 100%;
     background: rgba(0, 229, 255, 0.06);
     border: 1px solid rgba(0, 229, 255, 0.15);
@@ -3684,6 +3688,7 @@ body {
     font-size: 0.8rem;
     font-family: var(--font-ui, 'Inter', sans-serif);
     transition: all 0.2s ease;
+    box-shadow: none;
 }
 
 .doc-modal__search input:focus {
@@ -3721,6 +3726,18 @@ body {
 }
 
 .doc-nav-item {
+    /* Reset complet du style bouton natif */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    border: none;
+    border-radius: 0;
+    background: none;
+    background-color: transparent;
+    box-shadow: none;
+    margin: 0;
+    /* Style custom */
     padding: 0.7rem 1.25rem 0.7rem 1.5rem;
     cursor: pointer;
     color: var(--text-secondary, #8899aa);
@@ -3731,10 +3748,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     transition: all 0.2s ease;
-    border: none;
     border-left: 3px solid transparent;
-    border-radius: 0;
-    background: transparent;
     text-align: left;
     width: 100%;
     letter-spacing: 0.3px;
