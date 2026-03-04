@@ -1286,7 +1286,7 @@ body {
 /* ───────────────────────────────────────────────────────────────────────── */
 /* Raison : Sur 2K/4K les éléments par défaut deviennent trop petits.       */
 /* On agrandit les zones pour exploiter l'espace sans perte de lisibilité.  */
-@media screen and (min-width: 1440px) {
+@media screen and (min-width: 1441px) {
     :root {
         --sidebar-width: 280px;     /* Plus d'espace pour les labels système */
         --alarm-log-width: 340px;   /* Log d'alarmes plus confortable */
@@ -2139,8 +2139,11 @@ body {
 /* ───────────────────────────────────────────────────────────────────────── */
 /* Raison : Sur un 34" ultra-wide, le contenu s'étire trop.                 */
 /* On centre et on cap la largeur max.                                       */
-@media screen and (min-aspect-ratio: 21/9) and (min-width: 1200px) {
+/* ATTENTION : min-width: 2560px évite que ce media query ne se déclenche   */
+/* sur un laptop 1440px avec viewport court (ex: 1440×591 → ratio > 21/9)  */
+@media screen and (min-aspect-ratio: 21/9) and (min-width: 2560px) {
     .main-layout {
+        width: 100%;             /* Garantit le stretch dans le flex parent */
         max-width: 3200px;
         margin: 0 auto;
     }
