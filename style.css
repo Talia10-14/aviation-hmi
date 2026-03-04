@@ -39,6 +39,12 @@
     --accent-blue: #3388ff;
     --accent-purple: #aa77ff;
 
+    /* Aliases — compatibilité avec les anciens noms (doc, features, etc.) */
+    --cyan: var(--status-cyan);
+    --red: var(--status-warning);
+    --yellow: var(--status-caution);
+    --bg-dark: var(--bg-primary);
+
     /* Typography */
     --font-data: 'JetBrains Mono', 'Courier New', monospace;
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -3626,78 +3632,172 @@ body {
 
 .doc-modal__sidebar {
     width: 280px;
-    background: rgba(10, 15, 25, 0.8);
-    border-right: 1px solid rgba(0, 229, 255, 0.2);
-    padding: 24px 0;
+    background: var(--bg-secondary, rgba(10, 15, 25, 0.95));
+    border-right: 1px solid rgba(0, 229, 255, 0.15);
+    padding: 0;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── En-tête sidebar doc ── */
+.doc-modal__header {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.12);
+    flex-shrink: 0;
+}
+
+.doc-modal__header i {
+    font-size: 1.1rem;
+    color: var(--status-cyan, #00e5ff);
+    filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
 }
 
 .doc-modal__sidebar h2 {
-    color: var(--cyan);
-    font-size: 18px;
+    color: var(--status-cyan, #00e5ff);
+    font-size: 0.85rem;
     font-weight: 700;
-    padding: 0 24px 16px;
-    border-bottom: 1px solid rgba(0, 229, 255, 0.2);
-    margin-bottom: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0;
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
+/* ── Recherche dans la sidebar ── */
+.doc-modal__search {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.08);
+    flex-shrink: 0;
+}
+
+.doc-modal__search input {
+    width: 100%;
+    background: rgba(0, 229, 255, 0.06);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem 0.5rem 2rem;
+    color: var(--text-primary, #e0e6ed);
+    font-size: 0.8rem;
+    font-family: var(--font-ui, 'Inter', sans-serif);
+    transition: all 0.2s ease;
+}
+
+.doc-modal__search input:focus {
+    outline: none;
+    border-color: var(--status-cyan, #00e5ff);
+    background: rgba(0, 229, 255, 0.1);
+    box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.08);
+}
+
+.doc-modal__search input::placeholder {
+    color: var(--text-muted, #556677);
+    font-style: italic;
+}
+
+.doc-modal__search i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--text-muted, #556677);
+    pointer-events: none;
+}
+
+/* ── Navigation doc ── */
 .doc-modal__nav {
     list-style: none;
-    padding: 0;
+    padding: 0.5rem 0;
     margin: 0;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .doc-nav-item {
-    padding: 12px 24px;
+    padding: 0.7rem 1.25rem 0.7rem 1.5rem;
     cursor: pointer;
-    color: var(--text-secondary);
-    font-size: 14px;
+    color: var(--text-secondary, #8899aa);
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: var(--font-ui, 'Inter', sans-serif);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.75rem;
     transition: all 0.2s ease;
+    border: none;
     border-left: 3px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
 }
 
 .doc-nav-item:hover {
-    background: rgba(0, 229, 255, 0.1);
-    color: var(--text-primary);
+    background: rgba(0, 229, 255, 0.06);
+    color: var(--text-primary, #e0e6ed);
+    border-left-color: rgba(0, 229, 255, 0.3);
 }
 
+/* BEM active state (utilisé par documentation.js) */
+.doc-nav-item--active,
 .doc-nav-item.active {
-    background: rgba(0, 229, 255, 0.15);
-    color: var(--cyan);
-    border-left-color: var(--cyan);
+    background: rgba(0, 229, 255, 0.1);
+    color: var(--status-cyan, #00e5ff);
+    border-left-color: var(--status-cyan, #00e5ff);
+    font-weight: 600;
+}
+
+.doc-nav-item--active i,
+.doc-nav-item.active i {
+    color: var(--status-cyan, #00e5ff);
+    filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.3));
 }
 
 .doc-nav-item i {
-    font-size: 16px;
-    width: 20px;
+    font-size: 0.85rem;
+    width: 1.25rem;
     text-align: center;
+    flex-shrink: 0;
+    color: var(--text-muted, #556677);
+    transition: color 0.2s ease;
 }
 
+.doc-nav-item span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Footer sidebar doc ── */
+.doc-modal__footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid rgba(0, 229, 255, 0.08);
+    flex-shrink: 0;
+}
+
+.doc-version {
+    font-size: 0.65rem;
+    color: var(--text-muted, #556677);
+    font-family: var(--font-data, 'JetBrains Mono', monospace);
+    letter-spacing: 1px;
+}
+
+/* ── Contenu principal doc ── */
 .doc-modal__content {
     flex: 1;
-    padding: 32px;
+    padding: 2rem;
     overflow-y: auto;
-}
-
-.doc-modal__search {
-    width: 100%;
-    background: rgba(0, 229, 255, 0.1);
-    border: 1px solid rgba(0, 229, 255, 0.3);
-    border-radius: 4px;
-    padding: 12px 16px;
-    color: var(--text-primary);
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    margin-bottom: 24px;
-}
-
-.doc-modal__search:focus {
-    outline: none;
-    border-color: var(--cyan);
-    background: rgba(0, 229, 255, 0.15);
 }
 
 .doc-modal__close {
@@ -3718,16 +3818,17 @@ body {
 }
 
 .doc-modal__close:hover {
-    background: rgba(255, 0, 0, 0.2);
-    border-color: var(--red);
-    color: var(--red);
+    background: rgba(255, 51, 68, 0.15);
+    border-color: var(--status-warning, #ff3344);
+    color: var(--status-warning, #ff3344);
 }
 
 .doc-content h2 {
-    color: var(--cyan);
-    font-size: 28px;
+    color: var(--status-cyan, #00e5ff);
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
 }
 
 .doc-content h3 {
